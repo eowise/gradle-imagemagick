@@ -4,6 +4,8 @@ import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
@@ -13,6 +15,10 @@ import org.gradle.api.tasks.incremental.IncrementalTaskInputs
  */
 class Magick extends DefaultTask {
 
+    
+    @InputFiles
+    ConfigurableFileTree inputFiles
+    @OutputDirectory
     File outputDir
 
     DefaultMagickSpec spec;
@@ -23,19 +29,17 @@ class Magick extends DefaultTask {
 
 
     def input(ConfigurableFileTree inputFiles) {
-
-        inputs.files inputFiles
+        this.inputFiles = inputFiles
     }
 
     def inputOutput(ConfigurableFileTree inputFiles) {
-        inputs.files inputFiles
-        outputDir = inputFiles.getDir()
-        outputs.dir inputFiles.getDir()
+        this.inputFiles = inputFiles
+        this.outputDir = inputFiles.getDir()
+
     }
 
     def output(String path) {
         outputDir = project.file(path)
-        outputs.dir path
     }
 
 
@@ -59,7 +63,7 @@ class Magick extends DefaultTask {
         if (changedFiles.isEmpty() && removedFiles.isEmpty())
             throw new StopExecutionException("UP-TO-DATE")
 
-        inputs.getFiles().getAsFileTree().visit {
+        inputFiles.visit {
             f ->
                 if (changedFiles.contains(f.getFile())) {
                     f.getFile().getParentFile().mkdirs()
