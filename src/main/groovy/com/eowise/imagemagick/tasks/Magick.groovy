@@ -2,6 +2,7 @@ package com.eowise.imagemagick.tasks
 
 import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.TaskAction
@@ -12,10 +13,6 @@ import org.gradle.api.tasks.incremental.IncrementalTaskInputs
  */
 class Magick extends DefaultTask {
 
-    /*
-    @InputFiles
-    FileTree files
-*/
     File outputDir
 
     DefaultMagickSpec spec;
@@ -25,14 +22,15 @@ class Magick extends DefaultTask {
     }
 
 
-    def input(String path, String include) {
+    def input(ConfigurableFileTree inputFiles) {
 
-        inputs.files project.fileTree(dir: path, include: include)
+        inputs.files inputFiles
     }
 
-    def inputOutput(String path, String include) {
-        inputs.files project.fileTree(dir: path, include: include)
-        outputDir = project.file(path)
+    def inputOutput(ConfigurableFileTree inputFiles) {
+        inputs.files inputFiles
+        outputDir = inputFiles.getDir()
+        outputs.dir inputFiles.getDir()
     }
 
     def output(String path) {

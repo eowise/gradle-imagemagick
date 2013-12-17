@@ -1,12 +1,8 @@
 package com.eowise.imagemagick.specs
 
-import com.eowise.imagemagick.params.BorderParam
-import com.eowise.imagemagick.params.DrawParam
-import com.eowise.imagemagick.params.FileParam
-import com.eowise.imagemagick.params.Param
+import com.eowise.imagemagick.params.*
 import com.eowise.imagemagick.tasks.Magick
-import com.eowise.imagemagick.params.ConditionParam
-import com.eowise.imagemagick.params.SimpleParam
+import org.gradle.api.file.FileCollection
 
 /**
  * Created by aurel on 14/12/13.
@@ -79,14 +75,14 @@ class DefaultMagickSpec implements MagickSpec {
         params.add(new SimpleParam(')'))
     }
 
-    def condition(String condition, Closure closure) {
+    def condition(FileCollection matchingFiles, Closure closure) {
 
         MagickSpec spec = new DefaultMagickSpec()
         closure.delegate = spec
         closure.resolveStrategy = Closure.DELEGATE_ONLY
         closure()
 
-        params.add(new ConditionParam(task.inputs.getFiles(), condition, spec.params))
+        params.add(new ConditionParam(task.inputs.getFiles(), matchingFiles, spec.params))
     }
 
 

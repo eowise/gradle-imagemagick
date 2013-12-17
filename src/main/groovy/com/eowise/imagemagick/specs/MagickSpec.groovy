@@ -1,5 +1,7 @@
 package com.eowise.imagemagick.specs
 
+import org.gradle.api.file.FileCollection
+
 /**
  * Created by aurel on 14/12/13.
  */
@@ -30,7 +32,7 @@ interface MagickSpec {
 
     def stack(Closure closure)
 
-    def condition(String condition, Closure closure)
+    def condition(FileCollection matchingFiles, Closure closure)
 
     def shadow(String param)
 

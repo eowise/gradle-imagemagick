@@ -8,11 +8,11 @@ import org.gradle.api.file.FileVisitDetails
  */
 class ConditionParam implements Param {
 
-    FileCollection filteredFiles
+    FileCollection matchingFiles
     LinkedList<Param> params
 
-    ConditionParam(FileCollection original, String filePart, LinkedList<Param> params) {
-        this.filteredFiles = original.filter({ f -> f.name.contains(filePart) })
+    ConditionParam(FileCollection original, FileCollection matchingFiles, LinkedList<Param> params) {
+        this.matchingFiles = matchingFiles
         this.params = params
     }
 
@@ -21,7 +21,7 @@ class ConditionParam implements Param {
 
         LinkedList<String> toReturn = []
 
-        if (filteredFiles.contains(details.getFile()))
+        if (matchingFiles.contains(details.getFile()))
             params.each { p -> toReturn.addAll(p.toParams(details)) }
 
 
