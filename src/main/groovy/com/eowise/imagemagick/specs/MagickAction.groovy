@@ -1,18 +1,16 @@
 package com.eowise.imagemagick.specs
 
+import com.eowise.imagemagick.params.Param
+
 /**
  * Created by aurel on 14/12/13.
  */
 abstract class MagickAction {
 
-    protected LinkedList<String> innerParams
-    protected File file;
+    protected LinkedList<Param> params
 
-
-    MagickAction(File file) {
-        this.file = file
-        this.innerParams = []
+    MagickAction(LinkedList<Param> params) {
+        this.params = params
     }
 
-    abstract LinkedList<String> toParams()
 }

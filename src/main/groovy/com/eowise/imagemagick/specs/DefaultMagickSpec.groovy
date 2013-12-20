@@ -7,10 +7,10 @@ import org.gradle.api.file.FileCollection
 /**
  * Created by aurel on 14/12/13.
  */
-class DefaultMagickSpec implements MagickSpec {
+class DefaultMagickSpec implements MagickSpec, Serializable {
 
     LinkedList<Param> params
-    Magick task
+    transient Magick task
 
     public DefaultMagickSpec(Magick task) {
         this.task = task
@@ -71,6 +71,7 @@ class DefaultMagickSpec implements MagickSpec {
     def stack(Closure closure) {
         params.add(new SimpleParam('('))
         closure.delegate = this
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
         closure()
         params.add(new SimpleParam(')'))
     }
@@ -81,7 +82,6 @@ class DefaultMagickSpec implements MagickSpec {
         closure.delegate = spec
         closure.resolveStrategy = Closure.DELEGATE_ONLY
         closure()
-
         params.add(new ConditionParam(task.inputs.getFiles(), matchingFiles, spec.params))
     }
 
@@ -93,11 +93,15 @@ class DefaultMagickSpec implements MagickSpec {
 
 
     def draw(Closure closure) {
-        params.add(new DrawParam(closure))
+        closure.delegate = new Draw(params)
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure()
     }
 
     def border(Closure closure) {
-        params.add(new BorderParam(closure))
+        closure.delegate = new Border(params)
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure()
     }
 
     def layers(String operation) {
@@ -111,5 +115,9 @@ class DefaultMagickSpec implements MagickSpec {
 
     def composite() {
         params.add(new SimpleParam('-composite'))
+    }
+    
+    String toString() {
+        return params.join(' ')
     }
 }

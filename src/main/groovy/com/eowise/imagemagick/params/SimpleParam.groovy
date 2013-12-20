@@ -17,4 +17,8 @@ class SimpleParam implements Param {
     LinkedList<String> toParams(FileVisitDetails details) {
         return [value]
     }
+    
+    String toString() {
+        return value
+    }
 }

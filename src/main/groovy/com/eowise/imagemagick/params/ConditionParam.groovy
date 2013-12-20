@@ -27,4 +27,8 @@ class ConditionParam implements Param {
 
         return toReturn
     }
+    
+    String toString() {
+        return params.join(' ')
+    }
 }

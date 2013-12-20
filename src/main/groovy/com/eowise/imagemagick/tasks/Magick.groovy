@@ -1,15 +1,14 @@
 package com.eowise.imagemagick.tasks
-
 import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
-
 /**
  * Created by aurel on 14/12/13.
  */
@@ -17,32 +16,32 @@ class Magick extends DefaultTask {
 
     
     @InputFiles
-    ConfigurableFileTree inputFiles
+    FileTree inputFiles
     @OutputDirectory
     File outputDir
-
-    DefaultMagickSpec spec;
+    @Input
+    String inputSpec
+    DefaultMagickSpec spec
 
     Magick() {
-        spec = extensions.create('convert', DefaultMagickSpec.class, this)
+        this.spec = new DefaultMagickSpec(this)
     }
 
 
-    def input(ConfigurableFileTree inputFiles) {
-        this.inputFiles = inputFiles
-    }
 
-    def inputOutput(ConfigurableFileTree inputFiles) {
+    def input(FileTree inputFiles) {
         this.inputFiles = inputFiles
-        this.outputDir = inputFiles.getDir()
-
     }
 
     def output(String path) {
         outputDir = project.file(path)
     }
 
-
+    def convert(Closure closure) {
+        project.configure(spec, closure)
+        inputSpec = spec.toString()
+    }
+    
     @TaskAction
     void execute(IncrementalTaskInputs incrementalInputs) {
         LinkedList<String> execArgs = []

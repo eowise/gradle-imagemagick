@@ -1,51 +1,29 @@
 package com.eowise.imagemagick.specs
 
+import com.eowise.imagemagick.params.Param
+import com.eowise.imagemagick.params.SimpleParam
+
 /**
  * Created by aurel on 14/12/13.
  */
 class Draw extends MagickAction {
 
-    private Primitive primitive
-    private String coordinates
-    private String fillColor
-    private String strokeColor
-
-    Draw(File f) {
-        super(f)
-        this.coordinates = ''
+    Draw(LinkedList<Param> params) {
+        super(params)
     }
 
     def fill(String color) {
-        fillColor = color
+        params.add(new SimpleParam('-fill'))
+        params.add(new SimpleParam("$color"))
     }
 
     def stroke(String color) {
-        strokeColor = color
+        params.add(new SimpleParam('-stroke'))
+        params.add(new SimpleParam("$color"))
     }
 
-    def primitive(Primitive p) {
-        primitive = p
-    }
-
-    def coordinates(String c) {
-        coordinates = c
-    }
-
-    @Override
-    LinkedList<String> toParams() {
-        if (fillColor != null) {
-            innerParams.add('-fill')
-            innerParams.add("$fillColor")
-        }
-
-        if (strokeColor != null) {
-            innerParams.add('-stroke')
-            innerParams.add("$strokeColor")
-        }
-
-        innerParams.add('-draw')
-        innerParams.add("$primitive $coordinates")
-
-        return innerParams
+    def draw(Primitive primitive, String coordinates) {
+        params.add(new SimpleParam('-draw'))
+        params.add(new SimpleParam("$primitive $coordinates"))
     }
 }
