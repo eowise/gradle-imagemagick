@@ -1,11 +1,51 @@
 apply plugin: 'groovy'
+apply plugin: 'maven'
+
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 }
 
-apply plugin: 'maven'
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
 
 group = 'com.eowise'
-version = '0.1.0'
+version = '0.1.0-SNAPSHOT'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                packaging 'jar'
+                parent {
+                    groupId 'org.sonatype.oss'
+                    artifactId 'oss-parent'
+                    version 7
+                }
+                scm {
+                    connection 'scm:git:git@github.com:eowise/gradle-imagemagick.git'
+                    developerConnection 'scm:git:git@github.com:eowise/gradle-imagemagick.git'
+                    url 'git@github.com:eowise/gradle-imagemagick.git'
+                }
+            }
+        }
+    }
+}
