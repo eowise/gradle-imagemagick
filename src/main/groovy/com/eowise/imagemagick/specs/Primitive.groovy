@@ -6,7 +6,8 @@ package com.eowise.imagemagick.specs
 enum Primitive {
     point('%d,%d'),
     line('%d,%d %d,%d'),
-    rectangle('%d,%d %d,%d')
+    rectangle('%d,%d %d,%d'),
+    circle('%d,%d %d,%d')
 
     public final String coords
 

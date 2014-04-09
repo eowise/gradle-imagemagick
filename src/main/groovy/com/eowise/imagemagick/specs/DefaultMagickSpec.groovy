@@ -17,6 +17,11 @@ class DefaultMagickSpec implements MagickSpec, Serializable {
         params = []
     }
 
+    def methodMissing(String name, args) {
+        params.add(new SimpleParam('-' + name))
+        args.each { String arg -> params.add(new SimpleParam(arg)) }
+    }
+
     def verbose() {
         params.add(new SimpleParam('-verbose'))
     }
@@ -115,6 +120,11 @@ class DefaultMagickSpec implements MagickSpec, Serializable {
 
     def composite() {
         params.add(new SimpleParam('-composite'))
+    }
+
+    def compose(String operator) {
+        params.add(new SimpleParam('-compose'))
+        params.add(new SimpleParam(operator))
     }
     
     String toString() {

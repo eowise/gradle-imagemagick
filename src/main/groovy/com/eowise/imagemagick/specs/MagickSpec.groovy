@@ -45,4 +45,6 @@ interface MagickSpec {
     def repage()
 
     def composite()
+
+    def compose(String operator)
 }

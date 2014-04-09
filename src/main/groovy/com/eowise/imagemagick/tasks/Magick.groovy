@@ -3,6 +3,7 @@ import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -59,34 +60,35 @@ class Magick extends DefaultTask {
                 removedFiles.from(remove.file)
         }
 
-        if (changedFiles.isEmpty() && removedFiles.isEmpty())
-            throw new StopExecutionException("UP-TO-DATE")
 
         inputFiles.visit {
-            f ->
-                if (changedFiles.contains(f.getFile())) {
-                    f.getFile().getParentFile().mkdirs()
+            FileVisitDetails f ->
+                outputFile = project.file("${outputDir}/${f.getPath()}")
 
-                    outputFile = project.file("${outputDir}/${f.getPath()}")
+                if (changedFiles.contains(f.getFile()) || !outputFile.exists()) {
 
-                    spec.params.each {
-                        p ->
-                            execArgs.addAll(p.toParams(f))
+                    if (!f.getFile().isDirectory()) {
+                        spec.params.each {
+                            p ->
+                                execArgs.addAll(p.toParams(f))
+                        }
+
+                        execArgs.addFirst(f.getFile().toString())
+                        execArgs.addLast(outputFile.toString())
+
+                        outputFile.parentFile.mkdirs()
+
+                        logger.info("args", execArgs)
+
+                        project.exec {
+                            commandLine 'convert'
+                            args execArgs
+                        }
+
+                        execArgs.clear()
                     }
 
-                    execArgs.addFirst(f.getFile())
-                    execArgs.addLast(outputFile.toString())
 
-                    outputFile.parentFile.mkdirs()
-
-                    //println(execArgs)
-
-                    project.exec {
-                        commandLine 'convert'
-                        args execArgs
-                    }
-
-                    execArgs.clear()
                 } else if (removedFiles.contains(f.getFile())) {
                     project.delete("${path}/${f.getPath()}")
                 }
