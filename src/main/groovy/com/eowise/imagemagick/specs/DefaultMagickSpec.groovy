@@ -2,28 +2,33 @@ package com.eowise.imagemagick.specs
 
 import com.eowise.imagemagick.params.*
 import com.eowise.imagemagick.tasks.Magick
+import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 
 /**
  * Created by aurel on 14/12/13.
  */
-class DefaultMagickSpec implements MagickSpec, Serializable {
+class DefaultMagickSpec implements Serializable {
 
     LinkedList<Param> params
-    transient Magick task
+    transient Task task
 
-    public DefaultMagickSpec(Magick task) {
+    public DefaultMagickSpec(Task task) {
         this.task = task
         params = []
     }
 
     def methodMissing(String name, args) {
-        params.add(new SimpleParam('-' + name))
-        args.each { String arg -> params.add(new SimpleParam(arg)) }
+        SimpleParam nameParam = new SimpleParam(name)
+        params.add(nameParam)
+        args.each { arg -> params.add(new SimpleParam(arg.toString())) }
+        return nameParam
     }
 
-    def verbose() {
-        params.add(new SimpleParam('-verbose'))
+    def propertyMissing(String name) {
+        SimpleParam nameParam = new SimpleParam(name)
+        params.add(nameParam)
+        return nameParam
     }
 
     def input() {
@@ -32,45 +37,6 @@ class DefaultMagickSpec implements MagickSpec, Serializable {
 
     def xc(String color) {
         params.add(new SimpleParam("xc:${color}"))
-    }
-
-    def color(String color) {
-        params.add(new SimpleParam(color))
-    }
-
-    def size(String size) {
-        params.add(new SimpleParam('-size'))
-        params.add(new SimpleParam(size))
-    }
-
-    def resize(float ratio) {
-
-        params.add(new SimpleParam('-resize'))
-        params.add(new SimpleParam("${ratio * 100}%"))
-
-    }
-
-    def gravity(String gravity) {
-        params.add(new SimpleParam('-gravity'))
-        params.add(new SimpleParam(gravity))
-    }
-
-    def geometry(String geometry) {
-        params.add(new SimpleParam('-geometry'))
-        params.add(new SimpleParam(geometry))
-    }
-
-    def swap() {
-        params.add(new SimpleParam('+swap'))
-    }
-
-    def cloneLast() {
-        params.add(new SimpleParam('+clone'))
-    }
-
-    def background(String color) {
-        params.add(new SimpleParam('-background'))
-        params.add(new SimpleParam(color))
     }
 
     def stack(Closure closure) {
@@ -83,50 +49,13 @@ class DefaultMagickSpec implements MagickSpec, Serializable {
 
     def condition(FileCollection matchingFiles, Closure closure) {
 
-        MagickSpec spec = new DefaultMagickSpec()
+        DefaultMagickSpec spec = new DefaultMagickSpec()
         closure.delegate = spec
         closure.resolveStrategy = Closure.DELEGATE_ONLY
         closure()
-        params.add(new ConditionParam(task.inputs.getFiles(), matchingFiles, spec.params))
+        params.add(new ConditionParam(task.getInputs().getFiles(), matchingFiles, spec.params))
     }
 
-
-    def shadow(String param) {
-        params.add(new SimpleParam('-shadow'))
-        params.add(new SimpleParam(param))
-    }
-
-
-    def draw(Closure closure) {
-        closure.delegate = new Draw(params)
-        closure.resolveStrategy = Closure.DELEGATE_ONLY
-        closure()
-    }
-
-    def border(Closure closure) {
-        closure.delegate = new Border(params)
-        closure.resolveStrategy = Closure.DELEGATE_ONLY
-        closure()
-    }
-
-    def layers(String operation) {
-        params.add(new SimpleParam('-layers'))
-        params.add(new SimpleParam(operation))
-    }
-
-    def repage() {
-        params.add(new SimpleParam('+repage'))
-    }
-
-    def composite() {
-        params.add(new SimpleParam('-composite'))
-    }
-
-    def compose(String operator) {
-        params.add(new SimpleParam('-compose'))
-        params.add(new SimpleParam(operator))
-    }
-    
     String toString() {
         return params.join(' ')
     }

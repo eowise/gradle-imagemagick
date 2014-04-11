@@ -8,17 +8,29 @@ import org.gradle.api.file.FileVisitDetails
 class SimpleParam implements Param {
 
     String value
+    String sign
 
     SimpleParam(String value) {
         this.value = value
+        this.sign = ''
     }
 
     @Override
     LinkedList<String> toParams(FileVisitDetails details) {
-        return [value]
+        return [sign + value]
     }
     
     String toString() {
-        return value
+        return sign + value
+    }
+
+    @Override
+    def positive() {
+        sign = '+';
+    }
+
+    @Override
+    def negative() {
+        sign = '-';
     }
 }
