@@ -66,4 +66,22 @@ class DefaultMagickSpecTest extends Specification {
         then:
         spec.toString() == '+repage'
     }
+
+    def "stack add parenthesis"() {
+        DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+        Closure closure = {
+            -clone
+            stack {
+                -width(1)
+            }
+            +repage
+        }
+
+        closure.delegate = spec
+
+        when:
+        closure()
+        then:
+        spec.toString() == '-clone ( -width 1 ) +repage'
+    }
 }
