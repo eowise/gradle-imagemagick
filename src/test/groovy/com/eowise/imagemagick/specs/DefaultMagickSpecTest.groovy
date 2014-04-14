@@ -1,6 +1,5 @@
 package com.eowise.imagemagick.specs
 
-import com.eowise.imagemagick.tasks.Magick
 import org.gradle.api.Task
 import spock.lang.Specification
 
