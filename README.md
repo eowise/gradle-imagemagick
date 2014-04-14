@@ -22,16 +22,10 @@ buildscript {
 
 ## Usage
 
-### com.eowise.imagemagick.tasks.ImageInfo
-
-### com.eowise.imagemagick.tasks.SvgToPng
-
-### com.eowise.imagemagick.tasks.Magick
+### Magick
 
 ```groovy
 task addShadow(type: com.eowise.imagemagick.tasks.Magick) {
-    input fileTree('img', { include: '*.png' })
-    output 'outputDir'
     convert {
         stack {
             +clone
@@ -43,5 +37,18 @@ task addShadow(type: com.eowise.imagemagick.tasks.Magick) {
         -layers('merge')
         +repage
     }
+    files fileTree('img', { include: '*.png' })
+    to 'outputDir'
 }
 ```
+
+#### Convert
+
+`convert` accepts a closure witch is converted to a string and added as arguments to the convert command line.
+
+### SvgToPng
+
+### ImageInfo
+
+
+
