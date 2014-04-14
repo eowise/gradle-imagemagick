@@ -35,7 +35,8 @@ class Magick extends DefaultTask {
 
     def files(ConfigurableFileTree inputFiles) {
         this.inputFiles = inputFiles
-        this.output = { relativePath, fileName -> "${inputFiles.getDir()}/${relativePath}"  }
+        this.output = { relativePath -> "${inputFiles.getDir()}/${relativePath}"  }
+        this.outputDir = project.file(output(''))
     }
 
     def to(Closure outputClosure) {
