@@ -62,4 +62,16 @@ class MagickTest extends Specification {
         inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/computed-${f.getName()}") }
         task.outputDir == project.file('out')
     }
+
+    def "Test without output dir"() {
+        Project project = ProjectBuilder.builder().withProjectDir(new File('src/test/resources')).build()
+        Magick task = (Magick)project.task('magick', type: Magick)
+        FileTree inputFiles = project.fileTree('images', {include: '*.png'})
+
+        when:
+        task.files(inputFiles)
+        then:
+        inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("images/${f.getName()}") }
+        task.outputDir == project.file('images')
+    }
 }
