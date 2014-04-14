@@ -1,13 +1,12 @@
 package com.eowise.imagemagick.tasks
 import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
 /**
@@ -17,30 +16,49 @@ class Magick extends DefaultTask {
 
     
     @InputFiles
-    FileTree inputFiles
+    ConfigurableFileTree inputFiles
     @OutputDirectory
     File outputDir
     @Input
     String inputSpec
+
     DefaultMagickSpec spec
+    Closure output
+    Closure rename
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
+        this.rename = { fileName -> fileName}
     }
 
 
 
-    def input(FileTree inputFiles) {
+    def files(ConfigurableFileTree inputFiles) {
         this.inputFiles = inputFiles
+        this.output = { relativePath, fileName -> "${inputFiles.getDir()}/${relativePath}"  }
     }
 
-    def output(String path) {
-        outputDir = project.file(path)
+    def to(Closure outputClosure) {
+        this.output = outputClosure
+        this.outputDir = project.file(output(''))
+    }
+
+    def to(String path) {
+        this.output = { relativePath -> "${path}/${relativePath}"  }
+        this.outputDir = project.file(path)
+    }
+
+    def rename(Closure renameClosure) {
+        this.rename = renameClosure
     }
 
     def convert(Closure closure) {
         project.configure(spec, closure)
         inputSpec = spec.toString()
+    }
+
+    File getOutputFile(FileVisitDetails file) {
+        return project.file(output(file.getRelativePath().getParent().getPathString()) + '/' + rename(file.getName()) )
     }
     
     @TaskAction
@@ -63,7 +81,7 @@ class Magick extends DefaultTask {
 
         inputFiles.visit {
             FileVisitDetails f ->
-                outputFile = project.file("${outputDir}/${f.getPath()}")
+                outputFile = getOutputFile(f)
 
                 if (changedFiles.contains(f.getFile()) || !outputFile.exists()) {
 
