@@ -3,12 +3,15 @@ import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
+import org.gradle.api.tasks.util.PatternSet
+
 /**
  * Created by aurel on 14/12/13.
  */
@@ -16,7 +19,7 @@ class Magick extends DefaultTask {
 
     
     @InputFiles
-    ConfigurableFileTree inputFiles
+    FileTree inputFiles
     @OutputDirectory
     File outputDir
     @Input
@@ -28,23 +31,28 @@ class Magick extends DefaultTask {
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
-        this.rename = { fileName -> fileName}
+        this.rename = { fileName, extension -> "${fileName}.${extension}" }
     }
 
 
-
-    def files(ConfigurableFileTree inputFiles) {
-        this.inputFiles = inputFiles
-        this.output = { relativePath -> "${inputFiles.getDir()}/${relativePath}"  }
+    def from(String baseDir, PatternSet pattern) {
+        this.inputFiles = project.fileTree(baseDir).matching(pattern)
+        this.output = { relativePath -> "${baseDir}/${relativePath}"  }
         this.outputDir = project.file(output(''))
     }
 
-    def to(Closure outputClosure) {
+    def from(String baseDir, Closure closure) {
+        PatternSet pattern = project.configure(new PatternSet(), closure) as PatternSet
+
+        from(baseDir, pattern)
+    }
+
+    def into(Closure outputClosure) {
         this.output = outputClosure
         this.outputDir = project.file(output(''))
     }
 
-    def to(String path) {
+    def into(String path) {
         this.output = { relativePath -> "${path}/${relativePath}"  }
         this.outputDir = project.file(path)
     }
@@ -59,7 +67,11 @@ class Magick extends DefaultTask {
     }
 
     File getOutputFile(FileVisitDetails file) {
-        return project.file(output(file.getRelativePath().getParent().getPathString()) + '/' + rename(file.getName()) )
+
+        String name = file.getName()[0..<file.getName().lastIndexOf('.')]
+        String extension = file.getName().tokenize('.').last()
+
+        return project.file(output(file.getRelativePath().getParent().getPathString()) + '/' + rename(name, extension) )
     }
     
     @TaskAction

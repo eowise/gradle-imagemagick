@@ -1,4 +1,4 @@
 build/
 .idea/
-imagemagick.iml
+gradle-imagemagick.iml
 gradle.properties

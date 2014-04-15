@@ -15,11 +15,10 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'})
 
         when:
-        task.files(inputFiles)
-        task.to('out')
-        task.rename { fileName -> "computed-${fileName}" }
+        task.from('images', {include: '*.png'})
+        task.into('out')
         then:
-        inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/computed-${f.getName()}") }
+        inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/${f.getName()}") }
         task.outputDir == project.file('out')
     }
 
@@ -29,10 +28,11 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'})
 
         when:
-        task.files(inputFiles)
-        task.to('out')
+        task.from('images', {include: '*.png'})
+        task.into('out')
+        task.rename { fileName, extension -> "computed-${fileName}.${extension}" }
         then:
-        inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/${f.getName()}") }
+        inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/computed-${f.getName()}") }
         task.outputDir == project.file('out')
     }
 
@@ -42,8 +42,8 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'})
 
         when:
-        task.files(inputFiles)
-        task.to { relativePath -> "out/${relativePath}"}
+        task.from('images', {include: '*.png'})
+        task.into { relativePath -> "out/${relativePath}"}
         then:
         inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/${f.getName()}") }
         task.outputDir == project.file('out')
@@ -55,9 +55,9 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'})
 
         when:
-        task.files(inputFiles)
-        task.to { relativePath -> "out/${relativePath}"}
-        task.rename { fileName -> "computed-${fileName}" }
+        task.from('images', {include: '*.png'})
+        task.into { relativePath -> "out/${relativePath}"}
+        task.rename { fileName, extension -> "computed-${fileName}.${extension}" }
         then:
         inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("out/computed-${f.getName()}") }
         task.outputDir == project.file('out')
@@ -69,7 +69,7 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'})
 
         when:
-        task.files(inputFiles)
+        task.from('images', {include: '*.png'})
         then:
         inputFiles.visit { FileVisitDetails f -> assert task.getOutputFile(f) == project.file("images/${f.getName()}") }
         task.outputDir == project.file('images')

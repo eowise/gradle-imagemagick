@@ -1,9 +1,9 @@
 package com.eowise.imagemagick.specs
 
 import com.eowise.imagemagick.params.*
-import com.eowise.imagemagick.tasks.Magick
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Created by aurel on 14/12/13.
@@ -47,13 +47,13 @@ class DefaultMagickSpec implements Serializable {
         params.add(new SimpleParam(')'))
     }
 
-    def condition(FileCollection matchingFiles, Closure closure) {
+    def condition(PatternSet pattern, Closure closure) {
 
         DefaultMagickSpec spec = new DefaultMagickSpec()
         closure.delegate = spec
         closure.resolveStrategy = Closure.DELEGATE_ONLY
         closure()
-        params.add(new ConditionParam(task.getInputs().getFiles(), matchingFiles, spec.params))
+        params.add(new ConditionParam(task.getInputs().getFiles(), pattern, spec.params))
     }
 
     String toString() {
