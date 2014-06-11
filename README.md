@@ -20,4 +20,4 @@ buildscript {
 
 ## Usage
 
-Have a look at the (wiki)[https://github.com/eowise/gradle-imagemagick/wiki]
+Have a look at the [wiki](https://github.com/eowise/gradle-imagemagick/wiki)
