@@ -20,44 +20,4 @@ buildscript {
 
 ## Usage
 
-### Magick
-
-```groovy
-task addShadow(type: com.eowise.imagemagick.tasks.Magick) {
-    convert 'img', { include: '*.png' }
-    into 'outputDir'
-    actions {
-        inputFile()
-        stack {
-            +clone
-            -background('black')
-            -shadow('25x3+0+1.5')
-        }
-        +swap
-        -background('none')
-        -layers('merge')
-        +repage
-        outputFile()
-    }
-
-}
-```
-
-#### `convert`
-
-`convert` accepts a closure witch is converted to a string and added as arguments to the [ImageMagick convert](http://www.imagemagick.org/script/convert.php) command line.
-
-You can add a [stack](http://www.imagemagick.org/script/command-line-processing.php#stack) with the `stack` closure.
-
-#### `files`
-
-#### `to`
-
-#### `rename`
-
-### SvgToPng
-
-### ImageInfo
-
-
-
+Have a look at the (wiki)[https://github.com/eowise/gradle-imagemagick/wiki]
