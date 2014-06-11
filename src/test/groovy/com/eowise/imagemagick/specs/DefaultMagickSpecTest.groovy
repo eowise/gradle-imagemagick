@@ -11,6 +11,9 @@ class DefaultMagickSpecTest extends Specification {
 
     def "methodMissing is called"() {
         DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+
+        spec.setOutput { relativePath -> "path/${relativePath}" }
+
         Closure closure = {
             -background('black')
         }
@@ -25,6 +28,9 @@ class DefaultMagickSpecTest extends Specification {
 
     def "propertyMissing is called"() {
         DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+
+        spec.setOutput { relativePath -> "path/${relativePath}" }
+
         Closure closure = {
             -clone
         }
@@ -40,6 +46,9 @@ class DefaultMagickSpecTest extends Specification {
 
     def "- is added"() {
         DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+
+        spec.setOutput { relativePath -> "path/${relativePath}" }
+
         Closure closure = {
             -width(1)
         }
@@ -54,6 +63,9 @@ class DefaultMagickSpecTest extends Specification {
 
     def "+ is added"() {
         DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+
+        spec.setOutput { relativePath -> "path/${relativePath}" }
+
         Closure closure = {
             +repage
         }
@@ -68,6 +80,9 @@ class DefaultMagickSpecTest extends Specification {
 
     def "stack add parenthesis"() {
         DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+
+        spec.setOutput { relativePath -> "path/${relativePath}" }
+
         Closure closure = {
             -clone
             stack {

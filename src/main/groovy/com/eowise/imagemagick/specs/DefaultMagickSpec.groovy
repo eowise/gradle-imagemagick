@@ -2,7 +2,6 @@ package com.eowise.imagemagick.specs
 
 import com.eowise.imagemagick.params.*
 import org.gradle.api.Task
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.util.PatternSet
 
 /**
@@ -11,12 +10,23 @@ import org.gradle.api.tasks.util.PatternSet
 class DefaultMagickSpec implements Serializable {
 
     LinkedList<Param> params
-    transient Task task
+    Task task
+    Closure output
+    String inputBasePath
 
     public DefaultMagickSpec(Task task) {
         this.task = task
-        params = []
+        this.params = []
     }
+
+    def setOutput(Closure output) {
+        this.output = output
+    }
+
+    def setInputBasePath(String inputBasePath) {
+        this.inputBasePath = inputBasePath
+    }
+
 
     def methodMissing(String name, args) {
         SimpleParam nameParam = new SimpleParam(name)
@@ -31,8 +41,42 @@ class DefaultMagickSpec implements Serializable {
         return nameParam
     }
 
-    def input() {
-        params.add(new FileParam())
+    def inputFile() {
+        params.add(
+                new ComputedFileParam(
+                        task.getProject(),
+                        { relativePath -> "${inputBasePath}/${relativePath}"  },
+                        { fileName, extension -> "${fileName}.${extension}" }
+                )
+        )
+    }
+
+    def outputFile() {
+        params.add(
+                new ComputedFileParam(
+                        task.getProject(),
+                        output,
+                        { fileName, extension -> "${fileName}.${extension}" }
+                )
+        )
+    }
+
+    def outputFile(Closure rename) {
+        params.add(
+                new ComputedFileParam(
+                        task.getProject(),
+                        output,
+                        rename
+                )
+        )
+    }
+
+    def file(File f) {
+        params.add(new SimpleFileParam(f))
+    }
+
+    def file(Closure path, Closure rename) {
+        params.add(new ComputedFileParam(task.getProject(), path, rename))
     }
 
     def xc(String color) {

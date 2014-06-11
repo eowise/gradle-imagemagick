@@ -1,7 +1,7 @@
 gradle-imagemagick
 ==================
 
-Gradle tasks to easy integrate ImageMagick and Inkscape
+Gradle tasks to easy integrate ImageMagick
 
 ## Install
 
@@ -13,7 +13,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.eowise:gradle-imagemagick:0.1.0-SNAPSHOT'
+    classpath 'com.eowise:gradle-imagemagick:0.3.0-SNAPSHOT'
   }
 }
 ```
@@ -24,7 +24,10 @@ buildscript {
 
 ```groovy
 task addShadow(type: com.eowise.imagemagick.tasks.Magick) {
-    convert {
+    convert 'img', { include: '*.png' }
+    into 'outputDir'
+    actions {
+        inputFile()
         stack {
             +clone
             -background('black')
@@ -34,9 +37,9 @@ task addShadow(type: com.eowise.imagemagick.tasks.Magick) {
         -background('none')
         -layers('merge')
         +repage
+        outputFile()
     }
-    files fileTree('img', { include: '*.png' })
-    to 'outputDir'
+
 }
 ```
 

@@ -1,7 +1,6 @@
 package com.eowise.imagemagick.tasks
 import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileVisitDetails
@@ -27,56 +26,62 @@ class Magick extends DefaultTask {
 
     DefaultMagickSpec spec
     Closure output
-    Closure rename
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
-        this.rename = { fileName, extension -> "${fileName}.${extension}" }
     }
 
 
-    def from(String baseDir, PatternSet pattern) {
+    def convert(String baseDir, PatternSet pattern) {
         this.inputFiles = project.fileTree(baseDir).matching(pattern)
         this.output = { relativePath -> "${baseDir}/${relativePath}"  }
         this.outputDir = project.file(output(''))
+        this.spec.setInputBasePath(baseDir)
     }
 
-    def from(String baseDir, Closure closure) {
+    def convert(String baseDir, Closure closure) {
         PatternSet pattern = project.configure(new PatternSet(), closure) as PatternSet
 
-        from(baseDir, pattern)
+        convert(baseDir, pattern)
     }
 
     def into(Closure outputClosure) {
         this.output = outputClosure
         this.outputDir = project.file(output(''))
+        this.spec.setOutput(outputClosure)
     }
 
     def into(String path) {
-        this.output = { relativePath -> "${path}/${relativePath}"  }
-        this.outputDir = project.file(path)
+        into({ relativePath -> "${path}/${relativePath}"  })
     }
 
-    def rename(Closure renameClosure) {
-        this.rename = renameClosure
-    }
-
-    def convert(Closure closure) {
+    def actions(Closure closure) {
         project.configure(spec, closure)
         inputSpec = spec.toString()
     }
 
-    File getOutputFile(FileVisitDetails file) {
+    LinkedList<String> buildArgs(FileVisitDetails file) {
 
+        LinkedList<String> execArgs = []
+
+        spec.params.each {
+            p ->
+                execArgs.addAll(p.toParams(file))
+        }
+
+        return execArgs
+
+        /*
         String name = file.getName()[0..<file.getName().lastIndexOf('.')]
         String extension = file.getName().tokenize('.').last()
 
         return project.file(output(file.getRelativePath().getParent().getPathString()) + '/' + rename(name, extension) )
+        */
     }
     
     @TaskAction
     void execute(IncrementalTaskInputs incrementalInputs) {
-        LinkedList<String> execArgs = []
+        LinkedList<String> execArgs
         FileCollection changedFiles = project.files()
         FileCollection removedFiles = project.files()
         File outputFile
@@ -94,31 +99,18 @@ class Magick extends DefaultTask {
 
         inputFiles.visit {
             FileVisitDetails f ->
-                outputFile = getOutputFile(f)
 
-                if (changedFiles.contains(f.getFile()) || !outputFile.exists()) {
+                if (changedFiles.contains(f.getFile())) {
 
                     if (!f.getFile().isDirectory()) {
-                        spec.params.each {
-                            p ->
-                                execArgs.addAll(p.toParams(f))
-                        }
 
-                        execArgs.addFirst(f.getFile().toString())
-                        execArgs.addLast(outputFile.toString())
-
-                        outputFile.parentFile.mkdirs()
-
-                        logger.info("args", execArgs)
+                        execArgs = buildArgs(f)
 
                         project.exec {
                             commandLine 'convert'
                             args execArgs
                         }
-
-                        execArgs.clear()
                     }
-
 
                 } else if (removedFiles.contains(f.getFile())) {
                     project.delete("${path}/${f.getPath()}")
