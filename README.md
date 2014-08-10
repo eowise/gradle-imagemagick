@@ -9,11 +9,11 @@ Gradle tasks to easy integrate ImageMagick
 buildscript {
   repositories {
     maven {
-      url: 'https://oss.sonatype.org/content/repositories/snapshots/'
+      url 'https://oss.sonatype.org/content/repositories/central/'
   }
 
   dependencies {
-    classpath 'com.eowise:gradle-imagemagick:0.3.0-SNAPSHOT'
+    classpath 'com.eowise:gradle-imagemagick:0.3.0'
   }
 }
 ```
