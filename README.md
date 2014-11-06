@@ -8,8 +8,7 @@ Gradle tasks to easy integrate ImageMagick
 ```groovy
 buildscript {
   repositories {
-    maven {
-      url 'https://oss.sonatype.org/content/repositories/central/'
+    mavenCentral()
   }
 
   dependencies {
