@@ -1,6 +1,7 @@
 package com.eowise.imagemagick.specs
 
 import org.gradle.api.Task
+import org.gradle.api.tasks.util.PatternSet
 import spock.lang.Specification
 
 /**
@@ -89,6 +90,39 @@ class DefaultMagickSpecTest extends Specification {
                 -width(1)
             }
             +repage
+        }
+
+        closure.delegate = spec
+
+        when:
+        closure()
+        then:
+        spec.toString() == '-clone ( -width 1 ) +repage'
+    }
+
+    def "condition is called"() {
+        DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
+
+        spec.setOutput { relativePath -> "path/${relativePath}" }
+
+        Closure closure = {
+            condition(
+                    new PatternSet().include('images/*.png')
+                    ,
+                    {
+                        -matte
+                        -color('none')
+                        -width(1)
+                        xc('black')
+                        -gravity('North')
+                        -geometry('1x1+0x+0')
+                        -composite
+                        xc('black')
+                        -gravity('West')
+                        -geometry('1x1+0x+0')
+                        -composite
+                    }
+            )
         }
 
         closure.delegate = spec

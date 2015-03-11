@@ -29,16 +29,35 @@ class DefaultMagickSpec implements Serializable {
 
 
     def methodMissing(String name, args) {
+
         SimpleParam nameParam = new SimpleParam(name)
         params.add(nameParam)
-        args.each { arg -> params.add(new SimpleParam(arg.toString())) }
+
+        args.each {
+            String arg ->
+                if ( arg.startsWith('@')) {
+                    params.add(new FormattedParam(arg[1..<arg.length()], task))
+                }
+                else {
+                    params.add(new SimpleParam(arg.toString()))
+                }
+
+        }
+
+
         return nameParam
     }
 
     def propertyMissing(String name) {
-        SimpleParam nameParam = new SimpleParam(name)
-        params.add(nameParam)
-        return nameParam
+        if (task.ext.has(name)) {
+            return task.ext.get(name)
+        }
+        else {
+            SimpleParam nameParam = new SimpleParam(name)
+            params.add(nameParam)
+            return nameParam
+        }
+
     }
 
     def inputFile() {
@@ -86,19 +105,20 @@ class DefaultMagickSpec implements Serializable {
     def stack(Closure closure) {
         params.add(new SimpleParam('('))
         closure.delegate = this
-        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure()
         params.add(new SimpleParam(')'))
     }
 
     def condition(PatternSet pattern, Closure closure) {
-
-        DefaultMagickSpec spec = new DefaultMagickSpec()
+        DefaultMagickSpec spec = new DefaultMagickSpec(task)
         closure.delegate = spec
-        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure()
         params.add(new ConditionParam(task.getInputs().getFiles(), pattern, spec.params))
+        println(toString())
     }
+
 
     String toString() {
         return params.join(' ')

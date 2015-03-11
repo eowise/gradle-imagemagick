@@ -1,4 +1,6 @@
 package com.eowise.imagemagick.tasks
+
+import com.eowise.imagemagick.specs.FormattingSpec
 import com.eowise.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
@@ -25,10 +27,12 @@ class Magick extends DefaultTask {
     String inputSpec
 
     DefaultMagickSpec spec
+    FormattingSpec formattingSpec;
     Closure output
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
+        this.formattingSpec = new FormattingSpec(this)
     }
 
 
@@ -37,6 +41,7 @@ class Magick extends DefaultTask {
         this.output = { relativePath -> "${baseDir}/${relativePath}"  }
         this.outputDir = project.file(output(''))
         this.spec.setInputBasePath(baseDir)
+        this.formattingSpec.setInputBasePath(baseDir)
     }
 
     def convert(String baseDir, Closure closure) {
@@ -53,6 +58,10 @@ class Magick extends DefaultTask {
 
     def into(String path) {
         into({ relativePath -> "${path}/${relativePath}"  })
+    }
+
+    def formatting(Closure closure) {
+        project.configure(formattingSpec, closure)
     }
 
     def actions(Closure closure) {
@@ -103,6 +112,15 @@ class Magick extends DefaultTask {
                 if (changedFiles.contains(f.getFile())) {
 
                     if (!f.getFile().isDirectory()) {
+
+                        formattingSpec.formats.each {
+                            id, param ->
+                                project.exec {
+                                    commandLine 'convert'
+                                    args param.toParams(f)
+                                    standardOutput new FileOutputStream("${temporaryDir}/${f.getRelativePath()}.${id}.mvg")
+                                }
+                        }
 
                         execArgs = buildArgs(f)
 
