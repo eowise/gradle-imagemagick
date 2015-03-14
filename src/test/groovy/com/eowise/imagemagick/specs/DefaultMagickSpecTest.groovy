@@ -51,10 +51,11 @@ class DefaultMagickSpecTest extends Specification {
         spec.setOutput { relativePath -> "path/${relativePath}" }
 
         Closure closure = {
-            -width(1)
+            -width('1')
         }
 
         closure.delegate = spec
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
 
         when:
         closure()
@@ -72,6 +73,7 @@ class DefaultMagickSpecTest extends Specification {
         }
 
         closure.delegate = spec
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
 
         when:
         closure()
@@ -87,12 +89,13 @@ class DefaultMagickSpecTest extends Specification {
         Closure closure = {
             -clone
             stack {
-                -width(1)
+                -width('1')
             }
             +repage
         }
 
         closure.delegate = spec
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
 
         when:
         closure()
@@ -100,36 +103,4 @@ class DefaultMagickSpecTest extends Specification {
         spec.toString() == '-clone ( -width 1 ) +repage'
     }
 
-    def "condition is called"() {
-        DefaultMagickSpec spec = new DefaultMagickSpec(Mock(Task))
-
-        spec.setOutput { relativePath -> "path/${relativePath}" }
-
-        Closure closure = {
-            condition(
-                    new PatternSet().include('images/*.png')
-                    ,
-                    {
-                        -matte
-                        -color('none')
-                        -width(1)
-                        xc('black')
-                        -gravity('North')
-                        -geometry('1x1+0x+0')
-                        -composite
-                        xc('black')
-                        -gravity('West')
-                        -geometry('1x1+0x+0')
-                        -composite
-                    }
-            )
-        }
-
-        closure.delegate = spec
-
-        when:
-        closure()
-        then:
-        spec.toString() == '-clone ( -width 1 ) +repage'
-    }
 }
