@@ -49,8 +49,8 @@ class DefaultMagickSpec implements Serializable {
     }
 
     def propertyMissing(String name) {
-        if (task.ext.has(name)) {
-            return task.ext.get(name)
+        if (task.hasProperty(name)) {
+            return task[name]
         }
         else {
             SimpleParam nameParam = new SimpleParam(name)
