@@ -29,21 +29,19 @@ class DefaultMagickSpec implements Serializable {
 
 
     def methodMissing(String name, args) {
-
         SimpleParam nameParam = new SimpleParam(name)
         params.add(nameParam)
 
         args.each {
-            String arg ->
-                if ( arg.startsWith('@')) {
-                    params.add(new FormattedParam(arg[1..<arg.length()], task))
+            arg ->
+                String argValue = arg.toString();
+                if ( argValue.startsWith('@')) {
+                    params.add(new FormattedParam(argValue[1..<arg.length()], task))
                 }
                 else {
-                    params.add(new SimpleParam(arg.toString()))
+                    params.add(new SimpleParam(argValue.toString()))
                 }
-
         }
-
 
         return nameParam
     }
