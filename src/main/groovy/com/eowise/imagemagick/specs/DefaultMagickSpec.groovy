@@ -78,6 +78,16 @@ class DefaultMagickSpec implements Serializable {
         )
     }
 
+    def outputFile(String file) {
+        params.add(
+                new ComputedFileParam(
+                        task.getProject(),
+                        output,
+                        { fileName, extension -> "${file}" }
+                )
+        )
+    }
+
     def outputFile(Closure rename) {
         params.add(
                 new ComputedFileParam(
