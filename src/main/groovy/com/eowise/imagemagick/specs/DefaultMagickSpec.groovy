@@ -102,6 +102,11 @@ class DefaultMagickSpec implements Serializable {
         params.add(new SimpleParam("xc:${color}"))
     }
 
+    // Memory program register: See http://www.imagemagick.org/Usage/files/#mpr
+    def mpr(String label) {
+        params.add(new SimpleParam("mpr:${label}"))
+    }
+
     def stack(Closure closure) {
         params.add(new SimpleParam('('))
         closure.delegate = this
