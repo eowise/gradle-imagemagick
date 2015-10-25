@@ -1,67 +1,44 @@
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'signing'
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.4"
+}
 
 repositories {
-    mavenCentral()
-    mavenLocal()
+    jcenter()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        exclude module: 'groovy-all'
+    }
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'com.eowise'
+            artifactId 'gradle-imagemagick'
+            version '0.5.0'
+        }
+    }
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
-group = 'com.eowise'
-version = '0.4.0'
-
-signing {
-    sign configurations.archives
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                packaging 'jar'
-                parent {
-                    groupId 'org.sonatype.oss'
-                    artifactId 'oss-parent'
-                    version 7
-                }
-                scm {
-                    connection 'scm:git:git@github.com:eowise/gradle-imagemagick.git'
-                    developerConnection 'scm:git:git@github.com:eowise/gradle-imagemagick.git'
-                    url 'git@github.com:eowise/gradle-imagemagick.git'
-                }
-            }
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    publications = ['MyPublication']
+    pkg {
+        repo = 'maven'
+        name = 'gradle-imagemagick'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/eowise/gradle-imagemagick.git'
+        version {
+            name = '0.5.0'
+            vcsTag = 'v0.5.0'
         }
     }
 }

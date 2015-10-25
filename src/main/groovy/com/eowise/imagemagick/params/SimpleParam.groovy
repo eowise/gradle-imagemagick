@@ -24,12 +24,10 @@ class SimpleParam implements Param {
         return sign + value
     }
 
-    @Override
     def positive() {
         sign = '+';
     }
 
-    @Override
     def negative() {
         sign = '-';
     }
