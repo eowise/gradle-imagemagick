@@ -8,11 +8,11 @@ Gradle tasks to easy integrate ImageMagick
 ```groovy
 buildscript {
   repositories {
-    mavenCentral()
+    jCenter()
   }
 
   dependencies {
-    classpath 'com.eowise:gradle-imagemagick:0.4.0'
+    classpath 'com.eowise:gradle-imagemagick:0.5.0'
   }
 }
 ```
