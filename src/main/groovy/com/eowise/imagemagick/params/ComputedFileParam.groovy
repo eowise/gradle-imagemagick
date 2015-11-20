@@ -24,6 +24,11 @@ class ComputedFileParam implements Param {
     }
 
     @Override
+    String toString() {
+        return output("path") + '/' + (rename != null ? rename('file', 'ext') : '')
+    }
+
+    @Override
     LinkedList<String> toParams(FileVisitDetails details) {
 
         String name = details.getName()[0..<details.getName().lastIndexOf('.')]

@@ -20,4 +20,9 @@ class FormattedParam implements Param {
     LinkedList<String> toParams(FileVisitDetails details) {
         return [ "@${task.temporaryDir}/${details.getRelativePath()}.${id}.mvg" ]
     }
+
+    @Override
+    String toString() {
+        return id
+    }
 }

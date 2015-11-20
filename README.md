@@ -12,7 +12,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.eowise:gradle-imagemagick:0.5.0'
+    classpath 'com.eowise:gradle-imagemagick:0.5.1'
   }
 }
 ```

@@ -17,4 +17,9 @@ class SimpleFileParam implements Param {
     LinkedList<String> toParams(FileVisitDetails details) {
         return [file]
     }
+
+    @Override
+    String toString() {
+        return file.toString()
+    }
 }

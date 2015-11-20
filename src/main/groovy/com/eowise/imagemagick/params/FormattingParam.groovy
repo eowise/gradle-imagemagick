@@ -27,4 +27,9 @@ class FormattingParam implements Param {
 
         return toReturn
     }
+
+    @Override
+    String toString() {
+        return inputFile.toString() + ':' + format
+    }
 }
