@@ -1,10 +1,16 @@
 package com.eowise.imagemagick.tasks
 
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
+
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 
 class MagickTest extends Specification {
@@ -45,22 +51,15 @@ class MagickTest extends Specification {
         task.outputDir == project.file('out')
     }
 
-    def "Test closure output file"() {
-        Project project = ProjectBuilder.builder().withProjectDir(new File('src/test/resources')).build()
-        Magick task = (Magick)project.task('magick', type: Magick)
-        FileTree inputFiles = project.fileTree('images', {include: '*.png'})
-
+    def "Test closure output dir"() {
         when:
-        task.convert('images', {include: '*.png'})
-        task.into { relativePath -> "out/${relativePath}"}
-        task.actions {
-            inputFile()
-            -background('black')
-            outputFile()
-        }
+        GradleRunner.create()
+                .withProjectDir(new File(""))
+                .withArguments("testWithClosureOutputDir", "--rerun-tasks")
+                .build();
+
         then:
-        inputFiles.visit { FileVisitDetails f -> assert task.buildArgs(f).join(' ') == project.file('images/gradle.png').toString() + " -background black " + project.file('out/gradle.png').toString() }
-        task.outputDir == project.file('out')
+        new File("out/gradle.png").exists()
     }
 
     def "Test closure output file with rename"() {
@@ -96,5 +95,28 @@ class MagickTest extends Specification {
         then:
         inputFiles.visit { FileVisitDetails f -> assert task.buildArgs(f).join(' ') == project.file('images/gradle.png').toString() + " -background black " + project.file('images/gradle.png').toString() }
         task.outputDir == project.file('images')
+    }
+
+    def "Test removing input file remove also output file"() {
+
+        FileUtils.copyFile(new File('images/gradle.png'), new File('images/gradle2.png'));
+
+        when:
+        GradleRunner.create()
+                .withProjectDir(new File(""))
+                .withArguments("basicTest", "--rerun-tasks")
+                .build();
+
+        FileUtils.deleteQuietly(new File('images/gradle2.png'))
+
+        GradleRunner.create()
+                .withProjectDir(new File(""))
+                .withArguments("basicTest")
+                .build();
+
+
+        then:
+        new File("out/gradle.png").exists()
+        !new File("out/gradle2.png").exists()
     }
 }
