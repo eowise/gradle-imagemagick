@@ -29,6 +29,7 @@ class Magick extends DefaultTask {
     DefaultMagickSpec spec
     FormattingSpec formattingSpec;
     Closure output
+    Closure outputFileFormInputFileClosure
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
@@ -69,6 +70,10 @@ class Magick extends DefaultTask {
         inputSpec = spec.toString()
     }
 
+    def outputFileFormInputFile(Closure outputFileFormInputFile) {
+        this.outputFileFormInputFileClosure = outputFileFormInputFile
+    }
+
     LinkedList<String> buildArgs(FileVisitDetails file) {
 
         LinkedList<String> execArgs = []
@@ -79,30 +84,16 @@ class Magick extends DefaultTask {
         }
 
         return execArgs
-
-        /*
-        String name = file.getName()[0..<file.getName().lastIndexOf('.')]
-        String extension = file.getName().tokenize('.').last()
-
-        return project.file(output(file.getRelativePath().getParent().getPathString()) + '/' + rename(name, extension) )
-        */
     }
     
     @TaskAction
     void execute(IncrementalTaskInputs incrementalInputs) {
         LinkedList<String> execArgs
         FileCollection changedFiles = project.files()
-        FileCollection removedFiles = project.files()
-        File outputFile
 
         incrementalInputs.outOfDate {
             change ->
                 changedFiles.from(change.file)
-        }
-
-        incrementalInputs.removed {
-            remove ->
-                removedFiles.from(remove.file)
         }
 
 
@@ -130,9 +121,15 @@ class Magick extends DefaultTask {
                         }
                     }
 
-                } else if (removedFiles.contains(f.getFile())) {
-                    project.delete("${path}/${f.getPath()}")
                 }
+        }
+
+        if (incrementalInputs.isIncremental() && outputFileFormInputFileClosure != null) {
+            incrementalInputs.removed {
+                remove ->
+                    File outputFileToRemove = outputFileFormInputFileClosure(remove.file)
+                    outputFileToRemove.delete()
+            }
         }
     }
 }
