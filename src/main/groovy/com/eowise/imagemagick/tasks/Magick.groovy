@@ -8,6 +8,8 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
@@ -25,11 +27,16 @@ class Magick extends DefaultTask {
     File outputDir
     @Input
     String inputSpec
-
-    DefaultMagickSpec spec
-    FormattingSpec formattingSpec;
+    @Input
     Closure output
-    Closure outputFileFormInputFileClosure
+
+    @Internal
+    DefaultMagickSpec spec
+    @Internal
+    FormattingSpec formattingSpec
+//    @Input
+//    @Optional
+    Closure outputFileFromInputFileClosure
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
@@ -70,8 +77,8 @@ class Magick extends DefaultTask {
         inputSpec = spec.toString()
     }
 
-    def outputFileFormInputFile(Closure outputFileFormInputFile) {
-        this.outputFileFormInputFileClosure = outputFileFormInputFile
+    def outputFileFromInputFile(Closure outputFileFromInputFile) {
+        this.outputFileFromInputFileClosure = outputFileFromInputFile
     }
 
     LinkedList<String> buildArgs(FileVisitDetails file) {

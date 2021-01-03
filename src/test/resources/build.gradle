@@ -3,14 +3,14 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.eowise:gradle-imagemagick:0.5.1'
+        classpath 'com.eowise:gradle-imagemagick:0.5.2'
     }
 }
 
 task basicTest(type: com.eowise.imagemagick.tasks.Magick) {
     convert 'images', {include '*.png'}
     into 'out'
-    outputFileFormInputFile { File inputFile
+    outputFileFromInputFile { File inputFile
         -> file("out/${inputFile.name}")
     }
 
@@ -21,7 +21,6 @@ task basicTest(type: com.eowise.imagemagick.tasks.Magick) {
     }
 }
 
-
 task testWithClosureOutputDir(type: com.eowise.imagemagick.tasks.Magick) {
     convert 'images', {include '*.png'}
     into { relativePath -> "out/${relativePath}"}
@@ -30,4 +29,8 @@ task testWithClosureOutputDir(type: com.eowise.imagemagick.tasks.Magick) {
         -background('black')
         outputFile()
     }
+}
+
+task clean {
+    delete 'out'
 }
