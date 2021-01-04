@@ -32,8 +32,12 @@ publishing {
     }
 }
 
-test {
-    dependsOn publishToMavenLocal
+afterEvaluate {
+    if (tasks.findByName('check')) {
+        test {
+            dependsOn publishToMavenLocal
+        }
+    }
 }
 
 bintray {
