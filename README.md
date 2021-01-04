@@ -1,9 +1,10 @@
 gradle-imagemagick
 ==================
 
-Gradle tasks to easy integrate ImageMagick
+Gradle tasks to easily integrate ImageMagick
 
-## Install
+Install
+-------
 
 ```groovy
 buildscript {
@@ -12,11 +13,12 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.eowise:gradle-imagemagick:0.5.2'
+    classpath 'dev.binaryinfinity:gradle-imagemagick:0.0.1'
   }
 }
 ```
 
-## Usage
+Usage
+-----
 
-Have a look at the [wiki](https://github.com/eowise/gradle-imagemagick/wiki)
+Have a look at the [wiki](https://github.com/BinaryInfinityDev/gradle-imagemagick/wiki)
