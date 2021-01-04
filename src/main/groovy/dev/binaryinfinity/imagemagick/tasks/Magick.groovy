@@ -1,7 +1,7 @@
-package com.eowise.imagemagick.tasks
+package dev.binaryinfinity.imagemagick.tasks
 
-import com.eowise.imagemagick.specs.FormattingSpec
-import com.eowise.imagemagick.specs.DefaultMagickSpec
+import dev.binaryinfinity.imagemagick.specs.FormattingSpec
+import dev.binaryinfinity.imagemagick.specs.DefaultMagickSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
@@ -9,7 +9,6 @@ import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs

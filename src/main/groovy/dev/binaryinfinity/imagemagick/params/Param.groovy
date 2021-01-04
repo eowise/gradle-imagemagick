@@ -1,4 +1,4 @@
-package com.eowise.imagemagick.params
+package dev.binaryinfinity.imagemagick.params
 
 import org.gradle.api.file.FileVisitDetails
 

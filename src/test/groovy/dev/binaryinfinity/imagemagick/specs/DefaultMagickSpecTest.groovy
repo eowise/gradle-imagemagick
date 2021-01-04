@@ -1,7 +1,6 @@
-package com.eowise.imagemagick.specs
+package dev.binaryinfinity.imagemagick.specs
 
 import org.gradle.api.Task
-import org.gradle.api.tasks.util.PatternSet
 import spock.lang.Specification
 
 /**

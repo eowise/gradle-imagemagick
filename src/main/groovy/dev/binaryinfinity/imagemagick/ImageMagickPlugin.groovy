@@ -1,4 +1,4 @@
-package com.eowise.imagemagick
+package dev.binaryinfinity.imagemagick
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

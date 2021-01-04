@@ -1,7 +1,8 @@
-package com.eowise.imagemagick.specs
+package dev.binaryinfinity.imagemagick.specs
 
-import com.eowise.imagemagick.params.ComputedFileParam
-import com.eowise.imagemagick.params.FormattingParam
+
+import dev.binaryinfinity.imagemagick.params.ComputedFileParam
+import dev.binaryinfinity.imagemagick.params.FormattingParam
 import org.gradle.api.Task
 
 /**
@@ -12,7 +13,7 @@ class FormattingSpec {
     Task task
     Map formats
     String inputBasePath
-    ComputedFileParam inputFile
+  ComputedFileParam inputFile
 
     FormattingSpec(Task task) {
         this.task = task

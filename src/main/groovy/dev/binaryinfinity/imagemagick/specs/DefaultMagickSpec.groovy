@@ -1,6 +1,12 @@
-package com.eowise.imagemagick.specs
+package dev.binaryinfinity.imagemagick.specs
 
-import com.eowise.imagemagick.params.*
+
+import dev.binaryinfinity.imagemagick.params.ComputedFileParam
+import dev.binaryinfinity.imagemagick.params.ConditionParam
+import dev.binaryinfinity.imagemagick.params.FormattedParam
+import dev.binaryinfinity.imagemagick.params.Param
+import dev.binaryinfinity.imagemagick.params.SimpleFileParam
+import dev.binaryinfinity.imagemagick.params.SimpleParam
 import org.gradle.api.Task
 import org.gradle.api.tasks.util.PatternSet
 

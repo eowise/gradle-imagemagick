@@ -1,4 +1,4 @@
-package com.eowise.imagemagick.tasks
+package dev.binaryinfinity.imagemagick.tasks
 
 import org.gradle.api.DefaultTask
 
