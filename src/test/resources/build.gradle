@@ -3,7 +3,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'dev.binaryinfinity:gradle-imagemagick:0.0.1'
+        classpath "dev.binaryinfinity:gradle-imagemagick:${packageVersion}"
     }
 }
 
