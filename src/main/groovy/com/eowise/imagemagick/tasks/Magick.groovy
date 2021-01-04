@@ -28,6 +28,8 @@ class Magick extends DefaultTask {
     @Input
     String inputSpec
     @Input
+    String command
+    @Input
     Closure output
 
     @Internal
@@ -43,19 +45,28 @@ class Magick extends DefaultTask {
         this.formattingSpec = new FormattingSpec(this)
     }
 
-
-    def convert(String baseDir, PatternSet pattern) {
+    def verb(String baseDir, PatternSet pattern, String command) {
         this.inputFiles = project.fileTree(baseDir).matching(pattern)
-        this.output = { relativePath -> "${baseDir}/${relativePath}"  }
+        this.output = { relativePath -> "${baseDir}/${relativePath}" }
         this.outputDir = project.file(output(''))
         this.spec.setInputBasePath(baseDir)
         this.formattingSpec.setInputBasePath(baseDir)
+        this.command = command
+    }
+    def convert(String baseDir, PatternSet pattern) {
+        verb(baseDir, pattern, 'convert')
     }
 
     def convert(String baseDir, Closure closure) {
-        PatternSet pattern = project.configure(new PatternSet(), closure) as PatternSet
+        convert(baseDir, project.configure(new PatternSet(), closure) as PatternSet)
+    }
 
-        convert(baseDir, pattern)
+    def magick(String baseDir, PatternSet pattern) {
+        verb(baseDir, pattern, 'magick')
+    }
+
+    def magick(String baseDir, Closure closure) {
+        magick(baseDir, project.configure(new PatternSet(), closure) as PatternSet)
     }
 
     def into(Closure outputClosure) {
@@ -114,7 +125,7 @@ class Magick extends DefaultTask {
                         formattingSpec.formats.each {
                             id, param ->
                                 project.exec {
-                                    commandLine 'convert'
+                                    commandLine command
                                     args param.toParams(f)
                                     standardOutput new FileOutputStream("${temporaryDir}/${f.getRelativePath()}.${id}.mvg")
                                 }
@@ -123,7 +134,7 @@ class Magick extends DefaultTask {
                         execArgs = buildArgs(f)
 
                         project.exec {
-                            commandLine 'convert'
+                            commandLine command
                             args execArgs
                         }
                     }
@@ -134,7 +145,8 @@ class Magick extends DefaultTask {
         if (incrementalInputs.isIncremental() && outputFileFormInputFileClosure != null) {
             incrementalInputs.removed {
                 remove ->
-                    File outputFileToRemove = outputFileFormInputFileClosure(remove.file)
+                    println "Applying outPutFileFromInputClosure to ${remove.file}"
+                    File outputFileToRemove = outputFileFromInputFileClosure(remove.file)
                     outputFileToRemove.delete()
             }
         }

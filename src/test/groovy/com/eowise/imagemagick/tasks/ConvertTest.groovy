@@ -8,7 +8,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
 
-class MagickTest extends Specification {
+class ConvertTest extends Specification {
 
     def "Test string output file"() {
         Project project = ProjectBuilder.builder().withProjectDir(new File('src/test/resources')).build()
@@ -16,7 +16,7 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'; exclude: '*2.png'})
 
         when:
-        task.magick('images', {include: '*.png'; exclude: '*2.png'})
+        task.convert('images', {include: '*.png'; exclude: '*2.png'})
         task.into('out')
         task.actions {
             inputFile()
@@ -34,7 +34,7 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'; exclude: '*2.png'})
 
         when:
-        task.magick('images', {include: '*.png'; exclude: '*2.png'})
+        task.convert('images', {include: '*.png'; exclude: '*2.png'})
         task.into('out')
         task.actions {
             inputFile()
@@ -63,7 +63,7 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'; exclude: '*2.png'})
 
         when:
-        task.magick('images', {include: '*.png'; exclude: '*2.png'})
+        task.convert('images', {include: '*.png'; exclude: '*2.png'})
         task.into { relativePath -> "out/${relativePath}"}
         task.actions {
             inputFile()
@@ -82,7 +82,7 @@ class MagickTest extends Specification {
         FileTree inputFiles = project.fileTree('images', {include: '*.png'; exclude: '*2.png'})
 
         when:
-        task.magick('images', {include: '*.png'; exclude: '*2.png'})
+        task.convert('images', {include: '*.png'; exclude: '*2.png'})
         task.actions {
             inputFile()
             -background('black')
