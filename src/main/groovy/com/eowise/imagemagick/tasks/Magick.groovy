@@ -8,6 +8,8 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
@@ -25,30 +27,46 @@ class Magick extends DefaultTask {
     File outputDir
     @Input
     String inputSpec
-
-    DefaultMagickSpec spec
-    FormattingSpec formattingSpec;
+    @Input
+    String command
+    @Input
     Closure output
-    Closure outputFileFormInputFileClosure
+
+    @Internal
+    DefaultMagickSpec spec
+    @Internal
+    FormattingSpec formattingSpec
+//    @Input
+//    @Optional
+    Closure outputFileFromInputFileClosure
 
     Magick() {
         this.spec = new DefaultMagickSpec(this)
         this.formattingSpec = new FormattingSpec(this)
     }
 
-
-    def convert(String baseDir, PatternSet pattern) {
+    def verb(String baseDir, PatternSet pattern, String command) {
         this.inputFiles = project.fileTree(baseDir).matching(pattern)
-        this.output = { relativePath -> "${baseDir}/${relativePath}"  }
+        this.output = { relativePath -> "${baseDir}/${relativePath}" }
         this.outputDir = project.file(output(''))
         this.spec.setInputBasePath(baseDir)
         this.formattingSpec.setInputBasePath(baseDir)
+        this.command = command
+    }
+    def convert(String baseDir, PatternSet pattern) {
+        verb(baseDir, pattern, 'convert')
     }
 
     def convert(String baseDir, Closure closure) {
-        PatternSet pattern = project.configure(new PatternSet(), closure) as PatternSet
+        convert(baseDir, project.configure(new PatternSet(), closure) as PatternSet)
+    }
 
-        convert(baseDir, pattern)
+    def magick(String baseDir, PatternSet pattern) {
+        verb(baseDir, pattern, 'magick')
+    }
+
+    def magick(String baseDir, Closure closure) {
+        magick(baseDir, project.configure(new PatternSet(), closure) as PatternSet)
     }
 
     def into(Closure outputClosure) {
@@ -70,8 +88,8 @@ class Magick extends DefaultTask {
         inputSpec = spec.toString()
     }
 
-    def outputFileFormInputFile(Closure outputFileFormInputFile) {
-        this.outputFileFormInputFileClosure = outputFileFormInputFile
+    def outputFileFromInputFile(Closure outputFileFromInputFile) {
+        this.outputFileFromInputFileClosure = outputFileFromInputFile
     }
 
     LinkedList<String> buildArgs(FileVisitDetails file) {
@@ -107,7 +125,7 @@ class Magick extends DefaultTask {
                         formattingSpec.formats.each {
                             id, param ->
                                 project.exec {
-                                    commandLine 'convert'
+                                    commandLine command
                                     args param.toParams(f)
                                     standardOutput new FileOutputStream("${temporaryDir}/${f.getRelativePath()}.${id}.mvg")
                                 }
@@ -116,7 +134,7 @@ class Magick extends DefaultTask {
                         execArgs = buildArgs(f)
 
                         project.exec {
-                            commandLine 'convert'
+                            commandLine command
                             args execArgs
                         }
                     }
@@ -127,7 +145,8 @@ class Magick extends DefaultTask {
         if (incrementalInputs.isIncremental() && outputFileFormInputFileClosure != null) {
             incrementalInputs.removed {
                 remove ->
-                    File outputFileToRemove = outputFileFormInputFileClosure(remove.file)
+                    println "Applying outPutFileFromInputClosure to ${remove.file}"
+                    File outputFileToRemove = outputFileFromInputFileClosure(remove.file)
                     outputFileToRemove.delete()
             }
         }
